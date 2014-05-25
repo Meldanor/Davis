@@ -11,7 +11,7 @@ import de.meldanor.davis.datastructure.Graph.Edge;
 
 public class FruchtermannReingoldAlgorithm {
 
-    private double H;
+    private double W;
     private double L;
     private Graph graph;
 
@@ -23,7 +23,7 @@ public class FruchtermannReingoldAlgorithm {
     public FruchtermannReingoldAlgorithm(Graph graph, double width, double height) {
         this.graph = graph;
         this.edges = graph.getAllEdges();
-        this.H = width;
+        this.W = width;
         this.L = height;
 
         double area = width * height;
@@ -38,10 +38,10 @@ public class FruchtermannReingoldAlgorithm {
             GraphVertice vert = new GraphVertice();
             vert.vertice = i;
 
-            double x = rand.nextInt((int) H);
-            double y = rand.nextInt((int) L);
+            double x = rand.nextInt((int) W) + 1;
+            double y = rand.nextInt((int) L) + 1;
             vert.pos = new Vector2d(x, y);
-            vert.disp = new Vector2d();
+            vert.disp = new Vector2d(0.0, 0.0);
             vertices.add(vert);
         }
     }
@@ -68,6 +68,8 @@ public class FruchtermannReingoldAlgorithm {
 
     public List<GraphVertice> start(int iterations, int temperature) {
         this.initVertices();
+        if (iterations == 0)
+            return vertices;
 
         int t = temperature;
         int tTick = temperature / iterations;
@@ -85,7 +87,7 @@ public class FruchtermannReingoldAlgorithm {
                         difference.normalize();
                         difference.scale(fr);
 
-                        v.disp.add(difference);
+                        v.disp.add(v.disp, difference);
                     }
                 }
             }
@@ -102,8 +104,8 @@ public class FruchtermannReingoldAlgorithm {
                 difference.normalize();
                 difference.scale(fa);
 
-                v.disp.sub(difference);
-                u.disp.add(difference);
+                v.disp.sub(v.disp, difference);
+                u.disp.add(u.disp, difference);
             }
 
             // limit the maximum displacement of the temperature t
@@ -112,9 +114,9 @@ public class FruchtermannReingoldAlgorithm {
                 double min = Math.min(v.disp.length(), t);
                 v.disp.normalize();
                 v.disp.scale(min);
-                v.pos.add(v.disp);
-                v.pos.x = Math.min(H / 2, Math.max(-(H / 2), v.pos.x));
-                v.pos.y = Math.min(L / 2, Math.max(-(L / 2), v.pos.y));
+                v.pos.add(v.pos, v.disp);
+                v.pos.x = Math.min(W / 2, Math.max(-W / 2, v.pos.x));
+                v.pos.y = Math.min(L / 2, Math.max(-L / 2, v.pos.y));
             }
             // reduce the temperature
             t = t - tTick;

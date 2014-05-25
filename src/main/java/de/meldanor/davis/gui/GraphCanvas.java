@@ -44,11 +44,17 @@ public class GraphCanvas extends Canvas {
         FruchtermannReingoldAlgorithm al = new FruchtermannReingoldAlgorithm(graph, getWidth(), getHeight());
         List<GraphVertice> vertices = al.start(iterations, temperature);
 
+        for (GraphVertice graphVertice : vertices) {
+            if (Double.isNaN(graphVertice.pos.x) || Double.isNaN(graphVertice.pos.y)) {
+                g.fillText("Calculator error!", (getWidth() / 2) - 80, getHeight() / 2);
+                return;
+            }
+        }
+
         for (GraphVertice vertice : vertices) {
             drawVertice(g, vertice, vertices, graph);
         }
     }
-
     private void drawVertice(GraphicsContext g, GraphVertice vertice, List<GraphVertice> allVertices, Graph graph) {
         int circleSize = 20;
         List<Edge> edges = graph.getEdges(vertice.vertice);
