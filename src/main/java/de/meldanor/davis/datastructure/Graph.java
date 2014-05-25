@@ -39,6 +39,19 @@ public class Graph {
         return result;
 
     }
+    
+    public List<Edge> getAllEdges() {
+        List<Edge> result = new ArrayList<>();
+        for(int i = 0 ; i < vertices; ++i) {
+            List<Edge> ed = getEdges(i);
+            for (Edge edge : ed) {
+                if (!result.contains(edge))
+                    result.add(edge);
+            }
+            
+        }
+        return result;
+    }
 
     public int E() {
         return edges;
@@ -68,6 +81,15 @@ public class Graph {
         @Override
         public String toString() {
             return "(" + start + "," + end + ")";
+        }
+        
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Edge))
+                return false;
+            if (this == obj)
+                return true;
+            Edge e = (Edge)obj;
+            return (start == e.start && end == e.end) || (start == e.end && end == e.start);
         }
     }
 
