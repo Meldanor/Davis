@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javafx.geometry.Point2D;
+
 import javax.vecmath.Vector2d;
 
 import de.meldanor.davis.datastructure.Graph;
@@ -26,7 +28,7 @@ public class FruchtermannReingoldAlgorithm {
         this.W = width;
         this.L = height;
 
-        double area = width * height;
+        double area = W * L;
         this.k = Math.sqrt((area / graph.V()));
     }
 

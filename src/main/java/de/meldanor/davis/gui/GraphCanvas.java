@@ -41,7 +41,7 @@ public class GraphCanvas extends Canvas {
         g.setFont(standardFont);
         g.setFill(Color.RED);
 
-        FruchtermannReingoldAlgorithm al = new FruchtermannReingoldAlgorithm(graph, getWidth(), getHeight());
+        FruchtermannReingoldAlgorithm al = new FruchtermannReingoldAlgorithm(graph, getWidth() - 100, getHeight() - 100);
         List<GraphVertice> vertices = al.start(iterations, temperature);
 
         for (GraphVertice graphVertice : vertices) {
@@ -55,6 +55,7 @@ public class GraphCanvas extends Canvas {
             drawVertice(g, vertice, vertices, graph);
         }
     }
+
     private void drawVertice(GraphicsContext g, GraphVertice vertice, List<GraphVertice> allVertices, Graph graph) {
         int circleSize = 20;
         List<Edge> edges = graph.getEdges(vertice.vertice);
