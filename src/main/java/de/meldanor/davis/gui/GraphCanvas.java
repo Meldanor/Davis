@@ -45,7 +45,7 @@ public class GraphCanvas extends Canvas {
         List<GraphVertice> vertices = al.start(iterations, temperature);
 
         for (GraphVertice graphVertice : vertices) {
-            if (Double.isNaN(graphVertice.pos.x) || Double.isNaN(graphVertice.pos.y)) {
+            if (Double.isNaN(graphVertice.pos.getX()) || Double.isNaN(graphVertice.pos.getX())) {
                 g.fillText("Calculator error!", (getWidth() / 2) - 80, getHeight() / 2);
                 return;
             }
@@ -62,10 +62,10 @@ public class GraphCanvas extends Canvas {
         g.setStroke(Color.BLACK);
         for (Edge edge : edges) {
             GraphVertice end = allVertices.get(edge.getEnd());
-            g.strokeLine(vertice.pos.x + (circleSize / 2), vertice.pos.y + (circleSize / 2), end.pos.x + (circleSize / 2), end.pos.y + (circleSize / 2));
+            g.strokeLine(vertice.pos.getX() + (circleSize / 2), vertice.pos.getY() + (circleSize / 2), end.pos.getX() + (circleSize / 2), end.pos.getY() + (circleSize / 2));
         }
         g.setStroke(Color.RED);
-        g.fillOval(vertice.pos.x, vertice.pos.y, circleSize, circleSize);
+        g.fillOval(vertice.pos.getX(), vertice.pos.getY(), circleSize, circleSize);
 
     }
 

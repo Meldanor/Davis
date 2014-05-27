@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 import javafx.geometry.Point2D;
-
-import javax.vecmath.Vector2d;
-
 import de.meldanor.davis.datastructure.Graph;
 import de.meldanor.davis.datastructure.Graph.Edge;
 
@@ -42,8 +39,8 @@ public class FruchtermannReingoldAlgorithm {
 
             double x = rand.nextInt((int) W) + 1;
             double y = rand.nextInt((int) L) + 1;
-            vert.pos = new Vector2d(x, y);
-            vert.disp = new Vector2d(0.0, 0.0);
+            vert.pos = new Point2D(x, y);
+            vert.disp = new Point2D(0.0, 0.0);
             vertices.add(vert);
         }
     }
@@ -53,18 +50,30 @@ public class FruchtermannReingoldAlgorithm {
     }
 
     private double fr(double z) {
+        if (z == 0.0) {
+            throw new IllegalArgumentException("Divide by zero!");
+        }
         return (k * k) / z;
     }
 
     public class GraphVertice {
 
-        Vector2d pos;
-        Vector2d disp;
+        Point2D pos;
+        Point2D disp;
         int vertice;
 
         @Override
         public String toString() {
-            return vertice + "";
+            return "GraphVertice [pos=" + pos + ", disp=" + disp + ", vertice=" + vertice + "]";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null || !(obj instanceof GraphVertice))
+                return false;
+            return ((GraphVertice) obj).vertice == vertice;
         }
     }
 
@@ -76,20 +85,30 @@ public class FruchtermannReingoldAlgorithm {
         int t = temperature;
         int tTick = temperature / iterations;
 
-        for (int i = 1; i <= iterations; ++i) {
+        for (int i = 1; i <= 1000; ++i) {
             // calculate repulsive forces
             for (GraphVertice v : vertices) {
                 // each vertex has two vectors: .pos and .disp
-                v.disp = new Vector2d(0, 0);
+                v.disp = new Point2D(0, 0);
                 for (GraphVertice u : vertices) {
-                    if (u != v) {
-                        Vector2d difference = new Vector2d(0, 0);
-                        difference.sub(v.pos, u.pos);
-                        double fr = fr(difference.length());
-                        difference.normalize();
-                        difference.scale(fr);
+                    if (!v.equals(u)) {
+                        Point2D difference = v.pos.subtract(u.pos);
+                        if (difference.magnitude() == 0) {
+                            continue;
+                        }
+                        double fr = 0.0;
+                        try {
+                            fr = fr(difference.magnitude());
+                        } catch (Exception e) {
+                            System.out.println("Iteration: " + i);
+                            System.out.println("V: " + v + ";U: " + u);
+                            System.out.println(vertices);
+                            throw e;
+                        }
+                        difference = difference.normalize();
+                        difference = difference.multiply(fr);
 
-                        v.disp.add(v.disp, difference);
+                        v.disp = v.disp.add(difference);
                     }
                 }
             }
@@ -99,26 +118,23 @@ public class FruchtermannReingoldAlgorithm {
                 GraphVertice v = vertices.get(e.getStart());
                 GraphVertice u = vertices.get(e.getEnd());
 
-                Vector2d difference = new Vector2d();
-                difference.sub(v.pos, u.pos);
+                Point2D difference = v.pos.subtract(u.pos);
+                double fa = fa(difference.magnitude());
+                difference = difference.normalize();
+                difference = difference.multiply(fa);
 
-                double fa = fa(difference.length());
-                difference.normalize();
-                difference.scale(fa);
-
-                v.disp.sub(v.disp, difference);
-                u.disp.add(u.disp, difference);
+                v.disp = v.disp.subtract(difference);
+                u.disp = u.disp.add(difference);
             }
 
             // limit the maximum displacement of the temperature t
             // and then prevent from being displaced outside frame
             for (GraphVertice v : vertices) {
-                double min = Math.min(v.disp.length(), t);
-                v.disp.normalize();
-                v.disp.scale(min);
-                v.pos.add(v.pos, v.disp);
-                v.pos.x = Math.min(W / 2, Math.max(-W / 2, v.pos.x));
-                v.pos.y = Math.min(L / 2, Math.max(-L / 2, v.pos.y));
+                // v.pos := v.pos + ( v. disp/ |v.disp|) * min ( v.disp, t );
+                v.pos = v.pos.add(v.pos.normalize().multiply(Math.min(v.disp.magnitude(), t)));
+                double newX = Math.min(W / 2, Math.max(-W / 2, v.pos.getX()));
+                double newY = Math.min(L / 2, Math.max(-L / 2, v.pos.getY()));
+                v.pos = new Point2D(newX, newY);
             }
             // reduce the temperature
             t = t - tTick;

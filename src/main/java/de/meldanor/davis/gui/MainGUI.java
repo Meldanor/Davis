@@ -96,7 +96,7 @@ public class MainGUI extends Application {
                 int pair = 0;
                 do {
                     pair = rand.nextInt(size);
-                } while (used.contains(pair));
+                } while (used.contains(pair) && pair != i);
                 g.addEdge(i, pair);
             }
         }
